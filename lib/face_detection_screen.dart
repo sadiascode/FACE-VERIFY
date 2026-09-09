@@ -607,33 +607,30 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
 
         final shoulderRight = math.max(leftShoulder.x, rightShoulder.x);
 
-        final shoulderY = math.max(leftShoulder.y, rightShoulder.y);
+        final shoulderY = math.max(
+          leftShoulder.y,
+          rightShoulder.y,
+        );
 
         final shoulderWidth = shoulderRight - shoulderLeft;
 
         if (shoulderWidth > 0) {
-          /*
-         * Include both shoulders horizontally.
-         *
-         * Use a moderate horizontal padding rather than padding
-         * equal to the entire crop width.
-         */
-          final shoulderHorizontalPadding = shoulderWidth * 0.18;
+          final shoulderHorizontalPadding = shoulderWidth * 0.12;
 
-          left = math.min(left, shoulderLeft - shoulderHorizontalPadding);
+          left = math.min(
+            left,
+            shoulderLeft - shoulderHorizontalPadding,
+          );
 
-          right = math.max(right, shoulderRight + shoulderHorizontalPadding);
+          right = math.max(
+            right,
+            shoulderRight + shoulderHorizontalPadding,
+          );
 
-          /*
-         * Stop shortly below the shoulder line.
-         *
-         * A value between 0.10 and 0.20 normally includes the
-         * shoulders and a small area below the neck without
-         * extending deeply into the chest.
-         */
-          final belowShoulderPadding = shoulderWidth * 0.08;
+          // VERY SMALL area below shoulder
+          final belowShoulderPadding = shoulderWidth * 0.02;
 
-          bottom = math.max(bottom, shoulderY + belowShoulderPadding);
+          bottom = shoulderY + belowShoulderPadding;
         }
       }
     }
@@ -884,21 +881,45 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
           : Stack(
               children: [
                 // LIVE CAMERA
-                Positioned.fill(child: CameraPreview(_cameraController!)),
-
-                // FACE GUIDE
-                Center(
-                  child: Container(
-                    width: 260,
-                    height: 340,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: _straightCompleted ? Colors.green : Colors.white,
-                        width: 3,
-                      ),
-                      borderRadius: BorderRadius.circular(160),
+                Positioned.fill(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _cameraController!.value.previewSize!.height,
+                      height: _cameraController!.value.previewSize!.width,
+                      child: CameraPreview(_cameraController!),
                     ),
                   ),
+                ),
+
+                // FACE GUIDE
+                // RESPONSIVE FACE + SHOULDER GUIDE
+                Builder(
+                  builder: (context) {
+                    final size = MediaQuery.of(context).size;
+
+                    final guideWidth = size.width * 0.72;
+                    final guideHeight = guideWidth * 1.30;
+
+                    return Align(
+                      alignment: const Alignment(0, -0.15),
+                      child: Container(
+                        width: guideWidth,
+                        height: guideHeight,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _straightCompleted
+                                ? Colors.green
+                                : Colors.white,
+                            width: 3,
+                          ),
+                          borderRadius: BorderRadius.circular(
+                            guideWidth * 0.5,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
 
                 // TOP STATUS
@@ -917,7 +938,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
                   child: _buildBottomInfo(),
                 ),
               ],
-            ),
+      ),
     );
   }
 
