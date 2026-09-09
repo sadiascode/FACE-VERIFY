@@ -49,7 +49,6 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
   bool _leftCompleted = false;
   bool _rightCompleted = false;
   bool _straightCompleted = false;
-  bool _livePersonVerified = false;
 
   String _livenessMessage = 'Look at the camera and blink';
 
@@ -227,9 +226,9 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
 
       _eyesWereClosed = false;
 
-      if (!_livePersonVerified) {
-        _livenessMessage = 'Place your face inside the frame';
-      }
+      // if (!_livePersonVerified) {
+      //   _livenessMessage = 'Place your face inside the frame';
+      // }
     });
   }
 
@@ -395,13 +394,11 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
         setState(() {
           _rightCompleted = true;
 
-          _livePersonVerified = true;
-
-          _livenessMessage = 'Live Person Verified ✓\nNow look STRAIGHT';
+          _livenessMessage = 'Right movement detected ✓\nNow look STRAIGHT';
         });
 
         debugPrint('================================');
-        debugPrint('LIVE PERSON VERIFIED');
+        debugPrint('RIGHT MOVEMENT DETECTED');
         debugPrint('================================');
       }
 
@@ -436,8 +433,6 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
       _leftCompleted = false;
       _rightCompleted = false;
       _straightCompleted = false;
-
-      _livePersonVerified = false;
 
       _eyesWereClosed = false;
 
@@ -524,7 +519,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
                     height: 340,
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: _livePersonVerified
+                        color: _straightCompleted
                             ? Colors.green
                             : Colors.white,
                         width: 3,
@@ -558,7 +553,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
   Widget _buildTopStatus() {
     final Color statusColor;
 
-    if (_livePersonVerified) {
+    if (_straightCompleted) {
       statusColor = Colors.green;
     } else if (_faceCount == 1) {
       statusColor = Colors.orange;
@@ -579,7 +574,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
           Row(
             children: [
               Icon(
-                _livePersonVerified
+                _straightCompleted
                     ? Icons.verified
                     : _faceCount == 1
                     ? Icons.face
@@ -607,7 +602,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
           Text(
             _livenessMessage,
             style: TextStyle(
-              color: _livePersonVerified ? Colors.greenAccent : Colors.white,
+              color: _straightCompleted ? Colors.greenAccent : Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -690,7 +685,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
 
 
           // VERIFY AGAIN
-          if (_livePersonVerified)
+          if (_straightCompleted)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -728,10 +723,6 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
         _line(),
 
         _step('Right', _rightCompleted),
-
-        _line(),
-
-        _step('LIVE', _livePersonVerified),
 
         _line(),
 
